@@ -121,11 +121,3 @@ yes <- flights %>% select(AirTime, Speed, Distance)
 print(plot3d(yes))
 ```
 
-
-
-
-Hello World!
-
-
-
-
