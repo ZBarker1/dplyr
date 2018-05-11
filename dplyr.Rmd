@@ -1,0 +1,132 @@
+---
+title: "Dplyr tut"
+author: "Ziqi Liu"
+date: "May 10, 2018"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+    toc_depth: 2
+editor_options:
+  chunk_output_type: console
+---
+
+# 1.0 Loading dplyr
+
+- 5 basic verbs:
+1. filter()
+2. select()
+3. arrange()
+4. mutate()
+5. summarise()
+``` {r setup}
+suppressMessages(library(dplyr))
+library(hflights)
+sessionInfo()
+
+#explore data
+data(hflights)
+head(hflights)
+```
+
+- tbl_df creates a local data frame, wraps text so prints nicely
+``` {r local_data_frame}
+flights <- tbl_df(hflights)
+flights
+```
+
+# 2.0 filter()
+
+- allows you to filter by rows matching certain criteria
+
+### Command Structure
+- first argument is a data frame, following arguments are what to filter by
+- return value is a data frame
+``` {r filter}
+filter(flights, Month==1, DayofMonth==1)
+```
+
+# 3.0 select()
+
+- allows you to pick columns by name
+
+### Command Structure
+- first argument is a data frame, following arguments are column names
+``` {r select}
+select(flights, DepTime, ArrTime, FlightNum)
+```
+
+## 3.1 Chaining or Pipelining
+
+- allows you to perform multiple operations in one line by nesting commands
+- use the %>% operator (pronounced "and then")
+``` {r chain}
+flights %>%
+  select(UniqueCarrier, DepDelay) %>%
+  filter(DepDelay > 60)
+
+# use dataframe flights AND THEN select column names UniqueCarrier and DepDelay AND THEN filter by rows where DepDelay value > 60
+```
+
+# 4.0 arrange()
+
+- allows you to reorder rows by sorting in ascending order (default)
+
+### Command Structure
+
+- call dataframe, then select columns, then arrange by the column of choice
+- for descending order use arrange(desc(column_name))
+``` {r arrange}
+flights %>%
+  select(UniqueCarrier, DepDelay) %>%
+  arrange(DepDelay)
+
+# selects UniqueCarrier and DepDelay columns and then rearranges by DepDelay ascending
+```
+
+# 5.0 mutate()
+
+- allows you to add new variables that are functions of existing variables
+``` {r mutate}
+flights %>%
+  select(Distance, AirTime) %>%
+  mutate(Speed = Distance/AirTime*60)
+
+# creates new variable Speed that is a function of Distance and Airtime
+
+# to add to existing dataframe, don't select the columns
+flights <- flights %>%
+  mutate(Speed = Distance/AirTime*60)
+```
+
+# 6.0 summarise()
+
+- reduces variables to values, useful for data that has been grouped by one or more variables
+- group_by() creates the groups that will be operated on, summarise() uses the provided aggregation function to summarise each group
+``` {r summarise}
+flights %>%
+  group_by(Dest) %>%
+  summarise(avg_delay = mean(ArrDelay, na.rm=TRUE))
+
+# create a table grouped by Dest, then summarise each group into avg_delay by taking the mean of ArrDelay
+```
+
+# Notes
+- glimpse() lets you see the dataframe data better
+
+``` {r huh}
+library(rgl)
+yes <- flights %>% select(AirTime, Speed, Distance)
+print(plot3d(yes))
+```
+
+
+
+
+
+
+
+
+
+
